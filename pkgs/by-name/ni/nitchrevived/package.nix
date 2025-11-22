@@ -1,27 +1,27 @@
-{ lib, stdenv, fetchFromGitHub, nim }:
+{ lib, stdenv, fetchFromGitHub, nimble }:
 
 stdenv.mkDerivation rec {
   pname = "nitchrevived";
-  version = "0.1.7.3";
+  version = "0.1.7.5";
 
   src = fetchFromGitHub {
     owner = "gnuvalerie";
     repo = "nitchrevived";
-    rev = "b7a35f5e70a11508ef48329cdaf2693353365bf9";
-    sha256 = "sha256-5Ig0GQNn01bL15wJh8bRY2mJzZHeR+1YCyf0qoDuWpY=";
+    tag = "${version}";
+    sha256 = "sha256-R0grP4QcQeTvUAvSYCAxwD0Nw3fEXPWP3ImE60lK3QA=";
   };
 
-  nativeBuildInputs = [ nim ];
+  nativeBuildInputs = [ nimble ];
 
   buildPhase = ''
-    find src -type f -name '*.nim' -exec sed -i 's/exitcode/exitCode/g' {} +
     export HOME=$TMPDIR
-    nim c --opt:size --hints:off --warnings:off -d:release src/nitchrevived.nim
+    cd src
+    nimble build -d:release -d:danger --opt:speed --passC:-march=native --passC:-O3 --passL:-s
   '';
 
   installPhase = ''
     mkdir -p $out/bin
-    cp src/nitchrevived $out/bin/
+    cp nitchrevived $out/bin/
   '';
 
   meta = with lib; {
